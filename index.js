@@ -36,6 +36,13 @@ server.register([{
     throw err;
   }
 
+  // create cookie scheme from hapi-auth-cookie named session
+  server.auth.strategy('session', 'cookie', {
+    password: 'eGenCG7wGdzeiKISE7Ftt2A7z623G1I1',
+    redirectTo: '/auth/twitter',
+    isSecure: false  // set to false for development
+  });
+
   server.start(err => {
 
     if (err) {
