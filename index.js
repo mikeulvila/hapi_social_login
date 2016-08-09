@@ -26,6 +26,10 @@ server.register([{
       }, 'stdout']
     }
   }
+}, {
+  register: require('bell')
+}, {
+  register: require('hapi-auth-cookie')
 }], (err) => {
 
   if (err) {
