@@ -65,7 +65,22 @@ server.register([{
     }
   });
 
+  // use bell's twitter strategy for auth and set cookie
+  server.route({
+    method: 'GET',
+    path: '/auth/twitter',
+    handler: function (request, reply) {
 
+      request.cookieAuth.set(request.auth.credentials);
+
+      return reply.redirect('/');
+    },
+    config: {
+      auth: 'twitter'
+    }
+  });
+
+  // start server
   server.start(err => {
 
     if (err) {
