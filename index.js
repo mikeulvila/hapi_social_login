@@ -52,6 +52,20 @@ server.register([{
     isSecure: false
   });
 
+  // create routes
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler: function(request, reply) {
+
+      return reply(`Hello ${request.auth.credentials.profile.displayName}!`);
+    },
+    config: {
+      auth: 'session'
+    }
+  });
+
+
   server.start(err => {
 
     if (err) {
