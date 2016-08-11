@@ -27,9 +27,9 @@ server.register([{
     }
   }
 }, {
-  register: require('bell')
-}, {
   register: require('hapi-auth-cookie')
+}, {
+  register: require('bell')
 }], (err) => {
 
   if (err) {
@@ -39,7 +39,7 @@ server.register([{
   // cookie scheme from hapi-auth-cookie named session
   server.auth.strategy('session', 'cookie', {
     password: 'eGenCG7wGdzeiKISE7Ftt2A7z623G1I1',
-
+    redirectTo: '/',
     isSecure: false  // set to false for development
   });
 
@@ -55,10 +55,30 @@ server.register([{
     //Creating routes
     server.route({
         method: 'GET',
+        path: '/auth/twitter',
+        config: {
+          auth: 'twitter',
+          handler: function (request, reply) {
+
+            const profile = request.auth.credentials.profile;
+
+            request.cookieAuth.set({
+              twitterId: profile.id,
+              username: profile.username,
+              displayName: profile.displayName
+            });
+
+            return reply.redirect('/');
+          }
+        }
+    });
+
+    server.route({
+        method: 'GET',
         path: '/',
         handler: function (request, reply) {
-            console.log('auth in / ', request.auth.credentials);
-            return reply('Hello, ' + request.auth.credentials.profile.displayName + '!');
+            console.log('auth in / displayName: ', request.auth.credentials.displayName);
+            return reply('Hello, ' + request.auth.credentials.displayName + '!');
         },
         config: {
             auth: 'session'
@@ -77,23 +97,6 @@ server.register([{
         }
     });
 
-    server.route({
-        method: ['GET', 'POST'],
-        path: '/auth/twitter',
-        handler: function (request, reply) {
-
-          if (request.auth.isAuthenticated) {
-            console.log('made it to cookie set');
-            request.cookieAuth.set(request.auth.credentials);
-          }
-
-
-            return reply.redirect('/');
-        },
-        config: {
-            auth: 'twitter'
-        }
-    });
 
   // start server
   server.start(err => {
