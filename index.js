@@ -39,46 +39,59 @@ server.register([{
   // cookie scheme from hapi-auth-cookie named session
   server.auth.strategy('session', 'cookie', {
     password: 'eGenCG7wGdzeiKISE7Ftt2A7z623G1I1',
-    redirectTo: '/auth/twitter',
+
     isSecure: false  // set to false for development
   });
 
   // bell twitter scheme for auth
   server.auth.strategy('twitter', 'bell', {
     provider: 'twitter',
-    password: 'eGenCG7wGdzeiKISE7Ftt2A7z623G1I1',
+    password: 'cookie_encryption_password_secure',
     clientId: '',
     clientSecret: '',
     isSecure: false
   });
 
-  // create routes
-  server.route({
-    method: 'GET',
-    path: '/',
-    handler: function(request, reply) {
+    //Creating routes
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: function (request, reply) {
+            console.log('auth in / ', request.auth.credentials);
+            return reply('Hello, ' + request.auth.credentials.profile.displayName + '!');
+        },
+        config: {
+            auth: 'session'
+        }
+    });
 
-      return reply(`Hello ${request.auth.credentials.profile.displayName}!`);
-    },
-    config: {
-      auth: 'session'
-    }
-  });
+    server.route({
+        method: 'GET',
+        path: '/profile',
+        handler: function (request, reply) {
 
-  // use bell's twitter strategy for auth and set cookie
-  server.route({
-    method: 'GET',
-    path: '/auth/twitter',
-    handler: function (request, reply) {
+          return reply(request.auth.credentials);
+        },
+        config: {
+            auth: 'session'
+        }
+    });
 
-      request.cookieAuth.set(request.auth.credentials);
+    server.route({
+        method: ['GET', 'POST'],
+        path: '/auth/twitter',
+        handler: function (request, reply) {
 
-      return reply.redirect('/');
-    },
-    config: {
-      auth: 'twitter'
-    }
-  });
+          console.log('auth', request.auth.credentials);
+
+            request.cookieAuth.set(request.auth.credentials);
+
+            return reply.redirect('/');
+        },
+        config: {
+            auth: 'twitter'
+        }
+    });
 
   // start server
   server.start(err => {
