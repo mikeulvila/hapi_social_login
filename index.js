@@ -39,7 +39,7 @@ server.register([{
   // cookie scheme from hapi-auth-cookie named session
   server.auth.strategy('session', 'cookie', {
     password: 'eGenCG7wGdzeiKISE7Ftt2A7z623G1I1',
-    redirectTo: '/',
+    redirectTo: '/auth/twitter',
     isSecure: false  // set to false for development
   });
 
@@ -77,8 +77,9 @@ server.register([{
         method: 'GET',
         path: '/',
         handler: function (request, reply) {
-            console.log('auth in / displayName: ', request.auth.credentials.displayName);
-            return reply('Hello, ' + request.auth.credentials.displayName + '!');
+            const html = `<h1>Hello ${request.auth.credentials.displayName}!</h1>
+                          <a href="/logout">Logout</a>`;
+            return reply(html);
         },
         config: {
             auth: 'session'
@@ -95,6 +96,18 @@ server.register([{
         config: {
             auth: 'session'
         }
+    });
+
+    // logout
+    server.route({
+      method: 'GET',
+      path: '/logout',
+      handler: (request, reply) => {
+
+        request.cookieAuth.clear();
+
+        return reply('You are logged out!');
+      }
     });
 
 
