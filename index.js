@@ -82,9 +82,11 @@ server.register([{
         path: '/auth/twitter',
         handler: function (request, reply) {
 
-          console.log('auth', request.auth.credentials);
-
+          if (request.auth.isAuthenticated) {
+            console.log('made it to cookie set');
             request.cookieAuth.set(request.auth.credentials);
+          }
+
 
             return reply.redirect('/');
         },
